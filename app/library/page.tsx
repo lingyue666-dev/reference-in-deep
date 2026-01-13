@@ -1,59 +1,62 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Search, ExternalLink, Trash2, BookMarked } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+
+interface LibraryPaper {
+  id: string
+  title: string
+  authors: string[]
+  year: number
+  journal: string
+  url: string
+  addedAt: string
+  note?: string
+}
 
 export default function LibraryPage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [library, setLibrary] = useState<LibraryPaper[]>([])
+  const { toast } = useToast()
 
-  // Mock library data
-  const mockLibrary = [
-    {
-      id: "1",
-      title: "Deep Learning for Computer Vision: A Comprehensive Review",
-      authors: ["Zhang, Y.", "Wang, L.", "Chen, M."],
-      year: 2023,
-      journal: "arXiv preprint",
-      url: "https://arxiv.org/abs/2301.12345",
-      addedAt: "2024-12-15",
-      note: "重要综述文章",
-    },
-    {
-      id: "2",
-      title: "Attention Is All You Need: Transformer Networks in NLP",
-      authors: ["Vaswani, A.", "Shazeer, N.", "Parmar, N."],
-      year: 2023,
-      journal: "Neural Information Processing Systems",
-      url: "https://proceedings.neurips.cc/paper/2023/hash/abc123.html",
-      addedAt: "2024-12-14",
-      note: "",
-    },
-    {
-      id: "3",
-      title: "Transfer Learning in Deep Neural Networks: A Survey",
-      authors: ["Liu, H.", "Simonyan, K.", "Yang, Y."],
-      year: 2024,
-      journal: "Neural Networks",
-      url: "https://www.sciencedirect.com/science/article/pii/S0893608024000012",
-      addedAt: "2024-12-10",
-      note: "迁移学习相关",
-    },
-  ]
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('libraryPapers')
+      if (stored) {
+        try {
+          const papers = JSON.parse(stored)
+          setLibrary(papers)
+        } catch (error) {
+          console.error('Failed to parse library papers:', error)
+        }
+      }
+    }
+  }, [])
 
-  const filteredLibrary = mockLibrary.filter(
+  const filteredLibrary = library.filter(
     (paper) =>
       paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       paper.authors.some((author) => author.toLowerCase().includes(searchQuery.toLowerCase())),
   )
 
   const handleDelete = (id: string) => {
-    // In real app, would delete from database
-    console.log("Delete paper:", id)
+    const newLibrary = library.filter((paper) => paper.id !== id)
+    setLibrary(newLibrary)
+    
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('libraryPapers', JSON.stringify(newLibrary))
+    }
+    
+    toast({
+      title: "删除成功",
+      description: "文献已从文献库中移除",
+    })
   }
 
   return (
@@ -65,7 +68,7 @@ export default function LibraryPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-3xl font-bold">文献库</h1>
-              <p className="text-muted-foreground">您收藏的 {mockLibrary.length} 篇文献</p>
+              <p className="text-muted-foreground">您收藏的 {library.length} 篇文献</p>
             </div>
             <BookMarked className="w-8 h-8 text-muted-foreground" />
           </div>

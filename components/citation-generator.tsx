@@ -29,7 +29,8 @@ export function CitationGenerator({ papers }: CitationGeneratorProps) {
 
   const generateAPACitation = (paper: Paper) => {
     const authors = paper.authors.join(", ")
-    return `${authors} (${paper.year}). ${paper.title}. ${paper.journal}. https://doi.org/${paper.doi}`
+    const doi = paper.doi ? ` https://doi.org/${paper.doi}` : ''
+    return `${authors} (${paper.year}). ${paper.title}. ${paper.journal}.${doi}`
   }
 
   const generateMLACitation = (paper: Paper) => {
@@ -39,7 +40,8 @@ export function CitationGenerator({ papers }: CitationGeneratorProps) {
 
   const generateGBTCitation = (paper: Paper) => {
     const authors = paper.authors.join(", ")
-    return `${authors}. ${paper.title}[J]. ${paper.journal}, ${paper.year}. DOI: ${paper.doi}`
+    const doi = paper.doi ? ` DOI: ${paper.doi}` : ''
+    return `${authors}. ${paper.title}[J]. ${paper.journal}, ${paper.year}.${doi}`
   }
 
   const getCitation = (paper: Paper) => {

@@ -27,9 +27,10 @@ interface SearchResultsProps {
   papers: Paper[]
   selectedPapers: Paper[]
   onTogglePaper: (paper: Paper) => void
+  onAddToLibrary: (paper: Paper) => void
 }
 
-export function SearchResults({ topic, papers, selectedPapers, onTogglePaper }: SearchResultsProps) {
+export function SearchResults({ topic, papers, selectedPapers, onTogglePaper, onAddToLibrary }: SearchResultsProps) {
   const [expandedPapers, setExpandedPapers] = useState<Set<string>>(new Set())
   const [sortBy, setSortBy] = useState("relevance")
   const [filterYear, setFilterYear] = useState("all")
@@ -181,6 +182,16 @@ export function SearchResults({ topic, papers, selectedPapers, onTogglePaper }: 
                           加入引用
                         </>
                       )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAddToLibrary(paper)}
+                      className="gap-2"
+                    >
+                      <BookmarkPlus className="w-4 h-4" />
+                      加入文献库
                     </Button>
 
                     <Button variant="ghost" size="sm" onClick={() => toggleExpanded(paper.id)} className="gap-2">
