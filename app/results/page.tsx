@@ -33,6 +33,18 @@ function ResultsContent() {
         setPapers(results)
         setError(null)
         
+        console.log('Fetched papers:', results.length)
+        if (results.length > 0) {
+          console.log('First paper structure:', {
+            id: results[0].id,
+            title: results[0].title,
+            hasAiSummary: 'aiSummary' in results[0],
+            aiSummary: results[0].aiSummary,
+            hasAbstract: 'abstract' in results[0],
+            abstract: results[0].abstract?.substring(0, 100)
+          })
+        }
+        
         if (typeof window !== 'undefined') {
           const historyItem = {
             id: Date.now().toString(),
