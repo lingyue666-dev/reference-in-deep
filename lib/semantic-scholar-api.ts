@@ -116,20 +116,41 @@ export async function searchPapers(params: SearchParams): Promise<Paper[]> {
 }
 
 // 生成 AI 摘要的模拟函数，实际应用中可以使用 AI API
-function generateAISummary(abstract: string): string {
+function generateAISummary(abstract: any): string {
+  let abstractText = '';
+  
   if (!abstract) {
     return 'AI 摘要生成失败：原文摘要不可用';
   }
 
-  // 简单的摘要生成逻辑，实际应用中可以使用更复杂的 AI 模型
-  const sentences = abstract.split(/[.!?]+/).filter(s => s.trim().length > 0);
-  if (sentences.length === 0) {
-    return '该文献没有可用的摘要信息。';
-  }
+  try {
+    if (typeof abstract === 'string') {
+      abstractText = abstract;
+    } else if (typeof abstract === 'object' && abstract !== null) {
+      try {
+        abstractText = abstract.en || Object.values(abstract)[0] || '';
+      } catch {
+        abstractText = '';
+      }
+    } else {
+      abstractText = String(abstract);
+    }
+    
+    if (!abstractText || abstractText.trim().length === 0) {
+      return 'AI 摘要生成失败：原文摘要不可用';
+    }
 
-  // 取前1-2个句子作为 AI 摘要
-  const aiSummary = sentences.slice(0, 2).join('. ') + '.';
-  return aiSummary;
+    const sentences = abstractText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length === 0) {
+      return '该文献没有可用的摘要信息。';
+    }
+
+    const aiSummary = sentences.slice(0, 2).join('. ') + '.';
+    return aiSummary;
+  } catch (error) {
+    console.error('Error generating AI summary:', error);
+    return 'AI 摘要生成失败，请稍后重试';
+  }
 }
 
 // 根据论文 ID 获取单篇论文详情

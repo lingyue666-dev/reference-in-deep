@@ -139,7 +139,9 @@ export function SearchResults({ topic, papers, selectedPapers, onTogglePaper, on
                       <FileText className="w-4 h-4 text-accent" />
                       <span className="text-sm font-medium text-accent">AI 摘要</span>
                     </div>
-                    <p className="text-sm text-foreground/90 leading-relaxed">{paper.aiSummary}</p>
+                    <p className="text-sm text-foreground/90 leading-relaxed">
+                      {paper.aiSummary || 'AI 摘要生成中...'}
+                    </p>
                   </div>
 
                   {/* Expanded Details */}
