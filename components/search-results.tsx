@@ -150,7 +150,9 @@ export function SearchResults({ topic, papers, selectedPapers, onTogglePaper, on
                       <Separator />
                       <div className="space-y-2">
                         <p className="text-sm font-medium">原文摘要</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{paper.abstract}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {typeof paper.abstract === 'string' ? paper.abstract : '原文摘要不可用'}
+                        </p>
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>

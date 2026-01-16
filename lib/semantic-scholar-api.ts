@@ -101,18 +101,33 @@ export async function searchPapers(params: SearchParams): Promise<Paper[]> {
     return [];
   }
 
-  return papers.map((paper) => ({
-    id: paper.paperId,
-    title: paper.title || 'Untitled',
-    authors: paper.authors?.map(author => author.name) || [],
-    year: paper.year || 0,
-    source: paper.venue || 'Unknown',
-    doi: paper.doi || '',
-    journal: paper.journal?.name || paper.venue || 'Unknown Journal',
-    abstract: paper.abstract || 'Abstract not available',
-    url: paper.url || '',
-    aiSummary: generateAISummary(paper.abstract || ''),
-  }));
+  return papers.map((paper) => {
+    let abstractText = '';
+    if (typeof paper.abstract === 'string') {
+      abstractText = paper.abstract;
+    } else if (typeof paper.abstract === 'object' && paper.abstract !== null) {
+      try {
+        abstractText = paper.abstract.en || Object.values(paper.abstract)[0] || '';
+      } catch {
+        abstractText = '';
+      }
+    } else {
+      abstractText = 'Abstract not available';
+    }
+    
+    return {
+      id: paper.paperId,
+      title: paper.title || 'Untitled',
+      authors: paper.authors?.map(author => author.name) || [],
+      year: paper.year || 0,
+      source: paper.venue || 'Unknown',
+      doi: paper.doi || '',
+      journal: paper.journal?.name || paper.venue || 'Unknown Journal',
+      abstract: abstractText,
+      url: paper.url || '',
+      aiSummary: generateAISummary(paper.abstract),
+    };
+  });
 }
 
 // 生成 AI 摘要的模拟函数，实际应用中可以使用 AI API
