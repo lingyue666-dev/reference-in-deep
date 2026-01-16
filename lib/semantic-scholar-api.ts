@@ -186,6 +186,19 @@ export async function getPaperById(paperId: string): Promise<Paper> {
 
     const paper: SemanticScholarPaper = await response.json();
 
+    let abstractText = '';
+    if (typeof paper.abstract === 'string') {
+      abstractText = paper.abstract;
+    } else if (typeof paper.abstract === 'object' && paper.abstract !== null) {
+      try {
+        abstractText = paper.abstract.en || Object.values(paper.abstract)[0] || '';
+      } catch {
+        abstractText = '';
+      }
+    } else {
+      abstractText = 'Abstract not available';
+    }
+
     return {
       id: paper.paperId,
       title: paper.title || 'Untitled',
@@ -194,9 +207,9 @@ export async function getPaperById(paperId: string): Promise<Paper> {
       source: paper.venue || 'Unknown',
       doi: paper.doi || '',
       journal: paper.journal?.name || paper.venue || 'Unknown Journal',
-      abstract: paper.abstract || 'Abstract not available',
+      abstract: abstractText,
       url: paper.url || '',
-      aiSummary: generateAISummary(paper.abstract || ''),
+      aiSummary: generateAISummary(paper.abstract),
     };
   } catch (error) {
     console.error('Error fetching paper:', error);
